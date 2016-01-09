@@ -1,0 +1,13 @@
+{
+  "name": "orchid",
+  "version": "0.0.1",
+  "description": "Another DOM library.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "watch": "tsc --watch"
+  },
+  "author": "",
+  "license": "ISC"
+}
