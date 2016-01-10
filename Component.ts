@@ -31,7 +31,30 @@ namespace orchid.ui {
             className += key + styles[key];
         }
 
-        return className;
+        let cached = CSSClassCache[className];
+        if(!cached){
+
+            const modded = className.replace(/\'|%|#|\./g, "");
+            cached = CSSClassCache[className] = modded;
+
+            /// generate the CSS class.
+            const css = `.${modded} {`;
+            for (const key in styles){
+                css += `${key}:${styles[key]};`;
+            }
+            css += "};";
+
+            var node = document.createElement("style");
+            if("cssText" in node){
+                (node as any).cssText = css;
+            }
+            else {
+                node.appendChild(document.createTextNode(css));    
+            }
+            document.head.appendChild(node);
+        }
+
+        return cached;
     }
 
 
@@ -133,7 +156,7 @@ namespace orchid.ui {
 
             this.element.className = CSSObjectToClass(this.style);
 
-            $log(this.element.className);
+            // $log(this.element.className);
         }
         
 

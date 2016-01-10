@@ -9,25 +9,37 @@ namespace test {
 
 		protected mutateStyle(style: CSSObject): CSSObject {
 
+
+			// this.getElement().style.width = "33.333%";
+			// this.getElement().style.color = "#FF00FF";
+
 			style.width = "33.333%";
-			style.cssFloat = "left";
+			style.color = "#FF00FF";
 			return style;
 		}
 	}	
 }
 
 
-const one = new test.Item("div");
-one.validateNow();
-
-const two = new test.Item("span");
-two.validateNow();
-
-
 window.addEventListener("load", () => {
 
-	$log("HI");
 
-	document.body.appendChild(one.getElement());
-	document.body.appendChild(two.getElement());
+	setTimeout(() => {
+
+		const body = document.body;
+
+		const container = document.createElement("div");
+
+		for (const i = 0, len = 1000; i < len; i++) {
+
+			const one = new test.Item("div");
+			one.getElement().appendChild(document.createTextNode("HI"));
+			one.validateNow();
+			container.appendChild(one.getElement());
+		}
+
+		body.appendChild(container);
+
+	}, 500);
+
 });
