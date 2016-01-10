@@ -2,10 +2,9 @@
 
 
 namespace orchid {
-    export class CSSObject {
 
-        public width: string;
-        public float: string;
+    export interface CSSObject extends CSSStyleDeclaration {
+
     }
 }
 
@@ -15,7 +14,28 @@ namespace orchid.ui {
     import CSSObject = orchid.CSSObject;
 
 
-    export class Component<T> {
+
+    const CSSClassCache:Lookup<string> = {};
+
+    /**
+     * Takes a CSS object, converts it to a CSS class (if a cache entry doesn't 
+     *     exist) and returns a class name for the component to add to the DOM. 
+     * @param  {CSSObject} styles [description]
+     * @return {string}           [description]
+     */
+    function CSSObjectToClass(styles:CSSObject) : string {
+
+        let className = "";
+
+        for(const key in styles){
+            className += key + styles[key];
+        }
+
+        return className;
+    }
+
+
+    export class Component{
 
 
         //// protected properties
@@ -31,14 +51,14 @@ namespace orchid.ui {
          * true if our properties have been invalidated on this pass.
          * @type {boolean}
          */
-        protected propertiesInvalidated: boolean;
+        protected propertiesInvalidated: boolean = true;
 
 
         /**
          * true if our styles have been invalidated on this pass.
          * @type {boolean}
          */
-        protected stylesInvalidated: boolean;
+        protected stylesInvalidated: boolean = true;
 
 
 
@@ -49,11 +69,18 @@ namespace orchid.ui {
 
 
 
-        // constructor(type?: string, protected element: Node)
+        constructor(type: string, protected element = document.createElement(type)){
         // constructor(type: "div", protected element:HTMLDivElement);
         // constructor(type: "span", private element: HTMLSpanElement);
-        constructor(type?: string, protected element:T = document.createElement(type)) {
+        // constructor(type?: string, protected element:T = document.createElement(type)) {
 
+
+        }
+
+
+
+        public getElement(){
+            return this.element;
         }
 
 
@@ -64,6 +91,11 @@ namespace orchid.ui {
 
         public initialize() : void {
 
+
+            this.propertiesInvalidated = true;
+            this.stylesInvalidated = true;
+
+
             this.createChildren();
         }
 
@@ -71,6 +103,13 @@ namespace orchid.ui {
          * Overridable behaviour. Create any child elements we need for this component.
          */
         protected createChildren(): void { }
+
+
+
+        public invalidateProperties(): void { }
+
+        public invalidateStyles(): void { }
+
         
 
         /**
@@ -86,12 +125,21 @@ namespace orchid.ui {
          */
         protected mutateStyle(style: CSSObject): CSSObject { return style; }
 
-        protected commitStyles(): void { }
 
-        public invalidateProperties(): void {}
+        /**
+         * Commit our styles to the DOM.
+         */
+        protected commitStyles(): void {
+
+            this.element.className = CSSObjectToClass(this.style);
+
+            $log(this.element.className);
+        }
         
-        public invalidateStyles() : void {}
-        
+
+        /**
+         * Validate the overall state of this component.
+         */
         public validateNow() : void {
 
             if(this.propertiesInvalidated){
@@ -101,8 +149,9 @@ namespace orchid.ui {
             }
 
             if(this.stylesInvalidated){
+                this.stylesInvalidated = false;
 
-                this.style = this.mutateStyle(this.style || new CSSObject());
+                this.style = this.mutateStyle(this.style || {} as CSSObject);
                 this.commitStyles();   
             }
         }

@@ -12,6 +12,7 @@
         "node_modules"
     ],
     "files":[
+        "o.ts",
         "Component.ts",
         "index.ts"
     ]
