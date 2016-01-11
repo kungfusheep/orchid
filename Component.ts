@@ -34,11 +34,11 @@ namespace orchid.ui {
         let cached = CSSClassCache[className];
         if(!cached){
 
-            const modded = className.replace(/\'|%|#|\./g, "");
+            const modded = className.replace(/\'| |%|#|\./g, "");
             cached = CSSClassCache[className] = modded;
 
             /// generate the CSS class.
-            const css = `.${modded} {`;
+            let css = `.${modded} {`;
             for (const key in styles){
                 css += `${key}:${styles[key]};`;
             }
